@@ -1,0 +1,11 @@
+{
+    "light": {
+        "color": "black",
+        "figsize": [
+            8,
+            5
+        ],
+        "fontsize": 14,
+        "framealpha": 0.3
+    }
+}
