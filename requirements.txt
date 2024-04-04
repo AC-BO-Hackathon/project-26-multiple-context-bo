@@ -1,9 +1,7 @@
 -e . # package from this repo
-# numpy
-# scipy
-# pandas
-# matplotlib
-# matplotlib-inline
-# ipython
-# ipykernel
-pytest
+numpy
+pandas
+matplotlib
+seaborn
+scikit-learn
+git+https://github.com/emdgroup/baybe.git@0926594a28aa7cd5144df23a6d927e43ba79e84a
