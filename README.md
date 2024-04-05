@@ -2,8 +2,8 @@
 
 ## Intro
 Traditionally, Bayesian optimization (BO) is performed on a single, isolated campaign,
-which is not aware of results of potentially similar campaigns. Examples for such
-related campaigns could be:
+which is not aware of results of potentially similar pre-existing campaigns. Examples
+for such related campaigns could be:
 - Optimizing the same reaction conditions, but for a different pair of educts (assuming
   the same reaction type)
 - Optimizing mixtures for cell culture media, but for a different cell type
@@ -11,7 +11,7 @@ related campaigns could be:
   equipment, but in another geophysical location
 
 In all of these examples we want to perform a new campaign which is similar to one or
-more already performed campaigns. It is often not clear *ho* similar or even along which
+more already performed campaigns. It is often not clear *how* similar or even along which
 (potentially previously hidden) parameters, so including these data along a set of newly
 added traditional parameters can be difficult. The data should also not be added as part
 of the same campaign, as it might happen that the other campaign results are only
@@ -62,9 +62,9 @@ much information and thus leads only to a smaller improvement.
 
 
 ### Negated Noisy Hartmann 3D
-We optimize the Harmtann-3D function, a common benchmark for BO, taking its negated
+We optimize the Hartmann-3D function, a common benchmark for BO, taking its negated
 noisy variant as source task. For this investigation the otherwise analytical functions
-were evaluated ona  grid and we optimize the resulting discrete search space. This
+were evaluated on a grid, and we optimize the resulting discrete search space. This
 choice is motivated by utilizing a source task that is anti-correlated tos ee whether
 this relationship is automatically figured out and utilized for optimization
 improvement.
@@ -74,7 +74,9 @@ improvement.
 The result shows a clear benefit from adding source task data, even though it was noisy
 and anti-correlated to the target task. We see a remarkable improvement, already after
 adding only 1% of the existing source task data. In particular, the early optimization
-phase is boosted and the minimum is approached in a much steeper fashion.
+phase is boosted and the minimum is approached in a much steeper fashion. This outcome
+shows the enormous potential of this technology to boost real-world optimization
+campaigns in regimes where data on similar campaigns is available.
 
 ### Truncated Square
 Here, we take a 3 dimensional square function as target task with a minimum at 0 to be
@@ -100,7 +102,7 @@ hindered.
 ### Negated Noisy Levy
 
 This test function exhibits a strongly rippled surface. We take the negated noisy
-version as source and evaluate both functions on a grid before performing optimziation
+version as source and evaluate both functions on a grid before performing optimization
 in the resulting discrete search space.
 
 ![LevyResult](./results/levy.png)
@@ -114,10 +116,50 @@ for such a highly fluctuating test function.
 
 ### Reducing Source Data via Clustering
 
+Since the results from above indicate that there is a level of including too many
+source points which reduce the optimization performance, we perform tests on
+sub-selecting points from the source data instead of feeding the target campaign with
+all source data.
+
+This exercise was done with a scaled, shifted version of the Hartmann 6D function as
+source campaign while the target campaign is the original function. We investigate
+sets of randomly sampled source data set sizes, which in return are clustered via
+KMedoids. The cluster centroids are taken as parts of the source data that is ingested
+by the target campaign before optimization starts.
+
+#### 30 Available Source Points
 ![Clustering30Result](./results/cluster_experiments_30.svg)
-![Clustering250Result](./results/cluster_experiments_250.svg)
+#### 50 Available Source Points
+![Clustering50Result](./results/cluster_experiments_50.svg)
+#### 100 Available Source Points
+![Clustering250Result](./results/cluster_experiments_100.svg)
+
+We find that the baseline of ingesting all available source points always performs
+worst, independently of the amount of source points. This is roughly consistent with
+the results of the other studies in this project. Surprisingly, the best performers are
+often the campaigns with a small amount of clusters (2 or 5) resulting in also only a
+small number of ingested source points. Further investigation is needed to confirm this
+trend on other test problems. The even coverage achieved by the clustering seems to be
+more important than the sheer amount of source points available.
 
 ## Summary
+
+The overall trends revealed in this study show:
+- It is almost always beneficial to add source data of related tasks to the target
+  optimization campaign
+- The optimization boost can also be expected with multiple, anti-correlated, noisy or
+  partially correlated source campaigns which instills hope for the robustness of this
+  technology
+- There seems to be a transition after which adding more source points does not
+ increase performance further or even reduces it
+- Preliminary results of sub-sampling larger source data sets seem to indicate that it
+  is better to provide small sets of source data that cover the search space more evenly
+  rather than providing large sets of source data. Our interpretation of this is that
+  it might be more beneficial for a target campaign to receive a small amount of
+  information about the larger trends instead of receiving lots of data causing details
+  to be fitted by the surrogate model. Because source and target tasks are never
+  perfectly correlated, the latter could be detrimental to optimization of the target
+  campaign.
 
 ## Authors
 
